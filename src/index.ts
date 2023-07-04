@@ -1,1 +1,3 @@
-console.log("Initial commit")
+import { startServer } from "./server";
+
+startServer()
