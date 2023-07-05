@@ -1,4 +1,6 @@
 import mongoose from "mongoose";
+import { removePrivateMongoFields } from "../utils/mongoUtils";
+
 
 export interface IUser {
     "id": number,
@@ -47,7 +49,18 @@ const userSchema = new mongoose.Schema<IUser>({
         "catchPhrase": String,
         "bs": String
     },
-    createdAt: { type: Date, default: () => Date.now() }
+    "createdAt": { type: Date, default: () => Date.now() }
+}, {
+    // Throw error if values passed to our model constructor are not specified in our schema (unknown keys)
+    strict: "throw",
+    strictQuery: "throw",
+
+    toObject: {
+        transform: removePrivateMongoFields
+    },
+    toJSON: {
+        transform: removePrivateMongoFields
+    }
 })
 
 export const userModel = mongoose.model<IUser>("User", userSchema)
