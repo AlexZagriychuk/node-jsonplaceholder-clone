@@ -17,7 +17,8 @@ class AppError extends Error {
 
 // Error handling Middleware function for logging the error message
 const errorLogger = (error: Error, _req: Request, _res: Response, next: NextFunction) => {
-    console.error(`[Error] ${error.message}`)
+    const statusCode = error instanceof AppError ? error.statusCode + " " : ""
+    console.error(`[Error] ${statusCode}${error.message}`)
     next(error) // calling next middleware
 }
 
