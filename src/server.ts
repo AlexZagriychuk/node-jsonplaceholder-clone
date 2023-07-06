@@ -1,6 +1,7 @@
 import express from "express"
 import mongoose from "mongoose";
 import usersRouter from "./routes/users"
+import postsRouter from "./routes/posts"
 import resetDataRouter from "./routes/reset-data"
 import dotenv from "dotenv"
 import { requestLogger } from "./middleware/requestLoggers";
@@ -17,7 +18,8 @@ export async function startServer() {
 
     app.use("/reset-data", resetDataRouter)
     app.use("/users", usersRouter)
-    
+    app.use("/posts", postsRouter)
+
     app.use(errorLogger)
     app.use(errorResponder)
     app.use(invalidPathHandler)

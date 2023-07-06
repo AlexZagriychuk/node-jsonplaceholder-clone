@@ -1,7 +1,7 @@
 import express, { Request, Response, NextFunction } from "express"
-import mongoose from "mongoose";
 import { userModel as User } from "../models/user";
-import { generateUsers } from "../utils/mongoDbDataGenerator";
+import { postModel as Post } from "../models/post";
+import { generatePosts, generateUsers } from "../utils/mongoDbDataGenerator";
 
 const router = express.Router()
 
@@ -9,11 +9,13 @@ const router = express.Router()
 // ToDo: update in the future to allow this API call to Admin user only
 router.put("/", async (_req: Request, res: Response, next: NextFunction) => {
     try {
-        const db = mongoose.connection
         await User.deleteMany({}) // delete all
         await User.insertMany(generateUsers())
 
-        res.status(201).send("Data for: [users] has been reset in the MongoDB")
+        await Post.deleteMany({}) // delete all
+        await Post.insertMany(generatePosts())
+
+        res.status(201).send("Data for: [users, posts] has been reset in the MongoDB")
     } catch (error) {
         next(error)
     }

@@ -1,9 +1,15 @@
 import { IUser } from "../models/user"
-import { jsonplaceholderUsers } from "./jsonplaceholderData"
+import { jsonplaceholderPosts, jsonplaceholderUsers } from "./jsonplaceholderData"
 
 export function generateUsers() {
     // replacing "id" field with 24 character long hexadecimal "_id" field
     return replaceWithHex24Chars(jsonplaceholderUsers, [{ fieldName: "id", newFieldName: "_id" }])
+}
+
+export function generatePosts() {
+    // replacing "id" field with 24 character long hexadecimal "_id" field;
+    // converting "userId" field value to 24 character long hexadecimal
+    return replaceWithHex24Chars(jsonplaceholderPosts, [{ fieldName: "id", newFieldName: "_id" }, {fieldName: "userId"}])
 }
 
 // - If both fieldName and newFieldName are passed then the filed with name ${fieldName} will be removed from an obj ...
