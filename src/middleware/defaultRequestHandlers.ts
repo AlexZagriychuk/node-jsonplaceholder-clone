@@ -1,8 +1,9 @@
-import express, { Request, Response, NextFunction } from "express"
+import { Request, Response, NextFunction } from "express"
 import mongoose from "mongoose";
 import { AppError } from "./errorHandlers";
 
 export function processRequestGetAll(model: mongoose.Model<any>) {
+    // ToDo: figure out fow to avoid creating a new function on each call (add some kind of caching/memoizing)
     return async function (_req: Request, res: Response, next: NextFunction) {
         try {
             const allItems = await model.find()
