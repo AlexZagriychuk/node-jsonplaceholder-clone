@@ -1,9 +1,10 @@
 import mongoose from "mongoose";
 import { removePrivateMongoFields } from "../utils/mongoUtils";
+import { ObjectId } from "mongodb";
 
 
 export interface IUser {
-    "_id": string,
+    "_id": ObjectId,
     "name": string,
     "username": string,
     "email": string,
@@ -28,7 +29,7 @@ export interface IUser {
 }
 
 const userSchema = new mongoose.Schema<IUser>({
-    "_id": String,
+    "_id": {type: ObjectId, default: () => new ObjectId()},
     "name": String,
     "username": String,
     "email": String,
