@@ -10,7 +10,7 @@ const router = express.Router()
 router.put("/", async (_req: Request, res: Response, next: NextFunction) => {
     try {
         const db = mongoose.connection
-        await db.collection('users').deleteMany({})
+        await User.deleteMany({}) // delete all
         await User.insertMany(generateUsers())
 
         res.status(201).send("Data for: [users] has been reset in the MongoDB")
