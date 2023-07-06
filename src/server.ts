@@ -1,6 +1,7 @@
 import express from "express"
 import mongoose from "mongoose";
 import usersRouter from "./routes/users"
+import resetDataRouter from "./routes/reset-data"
 import dotenv from "dotenv"
 import { requestLogger } from "./middleware/requestLoggers";
 import { errorLogger, errorResponder, invalidPathHandler } from "./middleware/errorHandlers";
@@ -14,6 +15,7 @@ export async function startServer() {
     app.use(express.json())
     app.use(requestLogger)
 
+    app.use("/reset-data", resetDataRouter)
     app.use("/users", usersRouter)
     
     app.use(errorLogger)

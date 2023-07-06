@@ -3,7 +3,7 @@ import { removePrivateMongoFields } from "../utils/mongoUtils";
 
 
 export interface IUser {
-    "id": number,
+    "_id": string,
     "name": string,
     "username": string,
     "email": string,
@@ -28,7 +28,7 @@ export interface IUser {
 }
 
 const userSchema = new mongoose.Schema<IUser>({
-    "id": Number,
+    "_id": String,
     "name": String,
     "username": String,
     "email": String,
