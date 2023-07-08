@@ -3,13 +3,13 @@ export function replaceFieldNamesInObjects(objs: Array<any>, fieldsToReplace: Ar
 }
 
 export function replaceFieldNamesInObject(obj: any, fieldsToReplace: Array<{ fieldName: string, newFieldName: string }>) {
+    let copiedObj = JSON.parse(JSON.stringify(obj));
+
     fieldsToReplace.forEach(fieldToReplace => {
-        // delete old fieldName from the object...
-        const { [fieldToReplace.fieldName]: fieldValue, ...newObj } = obj;
-        obj = newObj
-        // And add a new filed name
-        obj[fieldToReplace.newFieldName] = fieldValue
+        const value = copiedObj[fieldToReplace.fieldName]
+        delete copiedObj[fieldToReplace.fieldName]
+        copiedObj[fieldToReplace.newFieldName] = value
     })
 
-    return obj
+    return copiedObj
 }

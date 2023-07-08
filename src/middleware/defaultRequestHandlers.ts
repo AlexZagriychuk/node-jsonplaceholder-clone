@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express"
 import mongoose from "mongoose";
 import { deleteOneDocByFilterQuery, findAllDocsByFilterQuery, findOneDocByFilterQuery, getDbFilterQuery, replaceOneDocByFilterQuery, updateOneDocByFilterQuery } from "../utils/mongoUtils";
+import { replaceIdInResponse } from "./responseHandlers";
 
 
 function getAllByQueryParamsCommonImpl(model: mongoose.Model<any>, customQueryParams: mongoose.FilterQuery<any> | null) {
@@ -11,7 +12,9 @@ function getAllByQueryParamsCommonImpl(model: mongoose.Model<any>, customQueryPa
 
             // false - to return empty arr if no docs found (does not throw error)
             const foundDocs = await findAllDocsByFilterQuery(model, queryParams, false)
-            res.status(200).type("json").send(JSON.stringify(foundDocs, null, 2))
+            const foundDocsReplaced = replaceIdInResponse(foundDocs)
+
+            res.status(200).type("json").send(JSON.stringify(foundDocsReplaced, null, 2))
         } catch (error) {
             next(error)
         }
@@ -31,7 +34,7 @@ export function processRequestGetById(model: mongoose.Model<any>) {
         try {
             const dbFilterQuery = getDbFilterQuery(req, [{reqQueryParam: "id", dbParam: "_id"}])
             const foundDoc = await findOneDocByFilterQuery(model, dbFilterQuery, true)
-            res.status(200).type("json").send(JSON.stringify(foundDoc, null, 2))
+            res.status(200).type("json").send(JSON.stringify(replaceIdInResponse(foundDoc), null, 2))
         } catch (error) {
             next(error)
         }
@@ -42,7 +45,7 @@ export function processRequestPost(model: mongoose.Model<any>) {
     return async function (req: Request, res: Response, next: NextFunction) {
         try {
             const createdDoc = await model.create(req.body)
-            res.status(201).type("json").send(JSON.stringify(createdDoc, null, 2))
+            res.status(201).type("json").send(JSON.stringify(replaceIdInResponse(createdDoc), null, 2))
         } catch (error) {
             next(error)
         }
@@ -57,7 +60,7 @@ export function processRequestPutById(model: mongoose.Model<any>) {
             const {doc, updatedExisting} = await replaceOneDocByFilterQuery(model, dbFilterQuery, req.body, true)
 
             const status = updatedExisting ? 200 : 201
-            res.status(status).type("json").send(JSON.stringify(doc, null, 2))
+            res.status(status).type("json").send(JSON.stringify(replaceIdInResponse(doc), null, 2))
         } catch (error) {
             next(error)
         }
