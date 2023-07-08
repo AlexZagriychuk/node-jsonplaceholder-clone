@@ -6,7 +6,8 @@ import { deleteOneDocByFilterQuery, findAllDocsByFilterQuery, findOneDocByFilter
 function getAllByQueryParamsCommonImpl(model: mongoose.Model<any>, customQueryParams: mongoose.FilterQuery<any> | null) {
     return async function (req: Request, res: Response, next: NextFunction) {
         try {
-            const queryParams = customQueryParams || req.query
+            // queryParams is either a mix of customQueryParams + req.query or req.query only (if customQueryParams is null)
+            const queryParams = Object.assign(req.query, customQueryParams) 
 
             // false - to return empty arr if no docs found (does not throw error)
             const foundDocs = await findAllDocsByFilterQuery(model, queryParams, false)
