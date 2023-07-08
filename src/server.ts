@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import usersRouter from "./routes/users"
 import postsRouter from "./routes/posts"
 import todosRouter from "./routes/todos"
+import albumsRouter from "./routes/albums"
 import resetDataRouter from "./routes/reset-data"
 import dotenv from "dotenv"
 import { requestLogger } from "./middleware/requestLoggers";
@@ -21,6 +22,7 @@ export async function startServer() {
     app.use("/users", usersRouter)
     app.use("/posts", postsRouter)
     app.use("/todos", todosRouter)
+    app.use("/albums", albumsRouter)
 
     app.use(errorLogger)
     app.use(errorResponder)

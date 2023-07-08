@@ -2,7 +2,8 @@ import express, { Request, Response, NextFunction } from "express"
 import { userModel as User } from "../models/user";
 import { postModel as Post } from "../models/post";
 import { todoModel as Todo } from "../models/todo";
-import { generatePosts, generateTodos, generateUsers } from "../utils/mongoDbDataGenerator";
+import { albumModel as Album } from "../models/album";
+import { generateAlbums, generatePosts, generateTodos, generateUsers } from "../utils/mongoDbDataGenerator";
 
 const router = express.Router()
 
@@ -18,8 +19,11 @@ router.put("/", async (_req: Request, res: Response, next: NextFunction) => {
 
         await Todo.deleteMany({}) // delete all
         await Todo.insertMany(generateTodos())
+
+        await Album.deleteMany({}) // delete all
+        await Album.insertMany(generateAlbums())
         
-        res.status(201).send("Data for: [users, posts] has been reset in the MongoDB")
+        res.status(201).send("Data for: [users, posts, todos, albums] has been reset in the MongoDB")
     } catch (error) {
         next(error)
     }

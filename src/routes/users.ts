@@ -2,6 +2,7 @@ import express, { NextFunction, Request, Response } from "express"
 import { userModel as User } from "../models/user";
 import { postModel as Post } from "../models/post";
 import { todoModel as Todo } from "../models/todo";
+import { albumModel as Album } from "../models/album";
 import { verifyBodyIsNotEmpty } from "../middleware/requestVerifiers";
 import { processRequestDeleteById, processRequestGetAllByCustomQueryParams, processRequestGetAllByRequestQueryParams, processRequestGetById, processRequestPatchById, processRequestPost, processRequestPutById } from "../middleware/defaultRequestHandlers"
 
@@ -23,6 +24,11 @@ router.get("/:id/posts", async function (req: Request, res: Response, next: Next
 router.get("/:id/todos", async function (req: Request, res: Response, next: NextFunction) {
     const userId = req.params.id
     const processRequestGetPostsByUserId = processRequestGetAllByCustomQueryParams(Todo, {userId})
+    await processRequestGetPostsByUserId(req, res, next)
+})
+router.get("/:id/albums", async function (req: Request, res: Response, next: NextFunction) {
+    const userId = req.params.id
+    const processRequestGetPostsByUserId = processRequestGetAllByCustomQueryParams(Album, {userId})
     await processRequestGetPostsByUserId(req, res, next)
 })
 
