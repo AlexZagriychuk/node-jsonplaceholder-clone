@@ -10,6 +10,7 @@ import resetDataRouter from "./routes/reset-data"
 import dotenv from "dotenv"
 import { requestLogger } from "./middleware/requestLoggers";
 import { errorLogger, errorResponder, invalidPathHandler } from "./middleware/errorHandlers";
+import cors from "cors"
 
 export async function startServer() {
     dotenv.config()
@@ -17,6 +18,7 @@ export async function startServer() {
     const DATABASE_URL = process.env.DATABASE_URL || "mongodb://127.0.0.1:27017/jsonplaceholder"
 
     const app = express()
+    app.use(cors())
     app.use(express.json())
     app.use(requestLogger)
 
