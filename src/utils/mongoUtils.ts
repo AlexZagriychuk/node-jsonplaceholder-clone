@@ -60,13 +60,13 @@ export async function findOneDocByFilterQuery(model: mongoose.Model<any>, dbFilt
 }
 
 // Returns response object { doc: UpdatedOrCreatedDoc, updatedExisting: boolean} or throws error
-async function updateOrReplaceOneDocByFilterQuery(model: mongoose.Model<any>, dbFilterQuery: mongoose.FilterQuery<any>, updateDoc: mongoose.UpdateQuery<any>, replaceExisting = false, createIfNotPresent = false) {
+async function updateOrReplaceOneDocByFilterQuery(model: mongoose.Model<any>, dbFilterQuery: mongoose.FilterQuery<any>, updateDoc: mongoose.UpdateQuery<any>, replace = false, createIfNotPresent = false) {
     const modelName = model.modelName
 
     try {
         // new: true - return updated document instead of original
         const options = {upsert: createIfNotPresent, new: true, rawResult: true}
-        const updateRawResult = replaceExisting 
+        const updateRawResult = replace 
             ? await model.findOneAndReplace(dbFilterQuery, updateDoc, options)
             : await model.findOneAndUpdate(dbFilterQuery, updateDoc, options)
 
@@ -87,8 +87,8 @@ async function updateOrReplaceOneDocByFilterQuery(model: mongoose.Model<any>, db
 
 // Only updates fields of existing document. Returns UpdatedDoc or throws error
 export async function updateOneDocByFilterQuery(model: mongoose.Model<any>, dbFilterQuery: mongoose.FilterQuery<any>, updateDoc: mongoose.UpdateQuery<any>) {
-    const { doc, updatedExisting} = await updateOrReplaceOneDocByFilterQuery(model, dbFilterQuery, updateDoc, false, false)
-    return doc
+    const { doc: updatedDoc } = await updateOrReplaceOneDocByFilterQuery(model, dbFilterQuery, updateDoc, false, false)
+    return updatedDoc
 }
 
 // Returns response object { doc: UpdatedOrCreatedDoc, updatedExisting: boolean} or throws error

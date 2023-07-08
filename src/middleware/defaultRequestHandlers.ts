@@ -52,6 +52,7 @@ export function processRequestPutById(model: mongoose.Model<any>) {
     return async function (req: Request, res: Response, next: NextFunction) {
         try {
             const dbFilterQuery = getDbFilterQuery(req, [{reqQueryParam: "id", dbParam: "_id"}])
+            // true - will update doc, or create if doc with this _id is not present
             const {doc, updatedExisting} = await replaceOneDocByFilterQuery(model, dbFilterQuery, req.body, true)
 
             const status = updatedExisting ? 200 : 201
@@ -66,6 +67,7 @@ export function processRequestPatchById(model: mongoose.Model<any>) {
     return async function (req: Request, res: Response, next: NextFunction) {
         try {
             const dbFilterQuery = getDbFilterQuery(req, [{reqQueryParam: "id", dbParam: "_id"}])
+            // Will update doc, or throw error if doc with this _id is not present
             const updatedDoc = await updateOneDocByFilterQuery(model, dbFilterQuery, req.body)
             res.status(201).type("json").send(JSON.stringify(updatedDoc, null, 2))
         } catch (error) {
