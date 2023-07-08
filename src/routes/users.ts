@@ -1,6 +1,7 @@
 import express, { NextFunction, Request, Response } from "express"
 import { userModel as User } from "../models/user";
 import { postModel as Post } from "../models/post";
+import { todoModel as Todo } from "../models/todo";
 import { verifyBodyIsNotEmpty } from "../middleware/requestVerifiers";
 import { processRequestDeleteById, processRequestGetAllByCustomQueryParams, processRequestGetAllByRequestQueryParams, processRequestGetById, processRequestPatchById, processRequestPost, processRequestPutById } from "../middleware/defaultRequestHandlers"
 
@@ -17,6 +18,11 @@ router.delete("/:id", processRequestDeleteById(User))
 router.get("/:id/posts", async function (req: Request, res: Response, next: NextFunction) {
     const userId = req.params.id
     const processRequestGetPostsByUserId = processRequestGetAllByCustomQueryParams(Post, {userId})
+    await processRequestGetPostsByUserId(req, res, next)
+})
+router.get("/:id/todos", async function (req: Request, res: Response, next: NextFunction) {
+    const userId = req.params.id
+    const processRequestGetPostsByUserId = processRequestGetAllByCustomQueryParams(Todo, {userId})
     await processRequestGetPostsByUserId(req, res, next)
 })
 
