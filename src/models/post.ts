@@ -1,19 +1,20 @@
 import mongoose from "mongoose";
-import { removePrivateMongoFields } from "../utils/mongoUtils";
-import { ObjectId } from "mongodb";
+import { removePrivateMongoFields, registerIdUpdater } from "../utils/mongoUtils";
 
+
+export const postIdCounterName = "PostID"
 
 export interface IPost {
-    "_id": ObjectId,
-    "userId": ObjectId,
+    "_id": number,
+    "userId": number,
     "title": string,
     "body": string,
     "createdAt": Date
 }
 
 const postSchema = new mongoose.Schema<IPost>({
-    "_id": {type: ObjectId, default: () => new ObjectId()},
-    "userId": {type: ObjectId, ref: "User"},
+    "_id": {type: Number, default: -1}, // default must not be positive if we use registerIdUpdater
+    "userId": {type: Number, ref: "User"},
     "title": String,
     "body": String,
     "createdAt": { type: Date, default: () => Date.now() }
@@ -29,5 +30,7 @@ const postSchema = new mongoose.Schema<IPost>({
         transform: removePrivateMongoFields
     }
 })
+
+registerIdUpdater(postSchema, postIdCounterName)
 
 export const postModel = mongoose.model<IPost>("Post", postSchema)

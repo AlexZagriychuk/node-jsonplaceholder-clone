@@ -1,14 +1,51 @@
 import mongoose from "mongoose";
 import { AppError } from "../middleware/errorHandlers";
 import { Request } from "express";
+import { idCounterModel as IdCounter } from "../models/id_counter";
 
 export function removePrivateMongoFields(_doc: mongoose.Document<any>, ret: Record<string, any>, _game: mongoose.ToObjectOptions<any>) {
     delete ret.__v;
 }
 
+// Find counter by name and increment by 1
+export async function getNextIdCounterValue(idCounterName: string) {
+    const idCounterDocument = await IdCounter.findByIdAndUpdate(idCounterName, {$inc: {last_id: 1} }, {new: true, upsert: true})
+    return idCounterDocument.last_id
+}
+
+// This function activates pre validation listener, which updates _id based on the value from IdCounter (for the current idCounterName)
+// If _id is already specified, then it will not be changed (which means we need to strictly control that user is not passing _id in post requests)
+export function registerIdUpdater(schema: mongoose.Schema, idCounterName: string) {
+    schema.pre('validate', async function(next) {
+        const doc = this
+        // Only update _id if the doc is new
+        if(!doc.isNew) {
+            next()
+            return
+        }
+
+        let currDocId = doc._id
+
+        if(typeof currDocId !== "number") {
+            throw new AppError(500, `[Implementation error] doc._id ${doc._id} must be a number for registerPreValidationIdUpdater to work`)
+        }
+
+        if(currDocId > 0) {
+            // if doc._id is already specified we do not change it and keep idCounterModel next_id as is (we should update it from the code if we pass fixed _id values)
+            next()
+            return
+        }
+
+        const nextId = await getNextIdCounterValue(idCounterName)
+        doc._id = nextId;
+        next();
+    }
+)}
+
 
 type ParamsMapping = Array<{reqQueryParam: string, dbParam: string}>
 
+// Generates FilterQuery for MongoDB based on request params and mapping between request params and Mongo DB param (can throw error)
 export function getDbFilterQuery(req: Request, paramsMapping: ParamsMapping) : mongoose.FilterQuery<any> {
     const missingQueryParams = [] as Array<string>
 
@@ -28,27 +65,20 @@ export function getDbFilterQuery(req: Request, paramsMapping: ParamsMapping) : m
     return dbFilterQuery
 }
 
+// If throwErrorIfNoDocsFound = true: returns array with 1+ found docs or throws error
+// If throwErrorIfNoDocsFound = false: returns empty array or array with 1+ found docs
 export async function findAllDocsByFilterQuery(model: mongoose.Model<any>, dbFilterQuery: mongoose.FilterQuery<any>, throwErrorIfNoDocsFound = true) {
     const modelName = model.modelName
+    const docs = await model.find(dbFilterQuery)
 
-    try {
-        const docs = await model.find(dbFilterQuery)
-
-        if(docs.length === 0 && throwErrorIfNoDocsFound) {
-            throw new AppError(404, `Cannot find ${modelName} by filter query ${JSON.stringify(dbFilterQuery)}`)
-        } else {
-            return docs
-        }
-    } catch (error: any) {
-        // If error of casting ":id" to MongoDB ObjectId ocurred, then we throw 404, because the object with this illegal _ID does not exist
-        if(error.kind === "ObjectId") {
-            throw new AppError(404, `Cannot find ${modelName} by filter query ${JSON.stringify(dbFilterQuery)} (illegal ObjectId value, must be 24 character hexadecimal)`)
-        } else {
-            throw error
-        }
+    if(docs.length === 0 && throwErrorIfNoDocsFound) {
+        throw new AppError(404, `Cannot find ${modelName} by filter query ${JSON.stringify(dbFilterQuery)}`)
+    } else {
+        return docs
     }
 }
 
+// Returns single found doc or throws error (0 or multiple found docs, or unexpected error) 
 export async function findOneDocByFilterQuery(model: mongoose.Model<any>, dbFilterQuery: mongoose.FilterQuery<any>, throwErrorIfMultipleDocsFound = true) {
     const foundDocs = await findAllDocsByFilterQuery(model, dbFilterQuery, true)
 
@@ -63,25 +93,16 @@ export async function findOneDocByFilterQuery(model: mongoose.Model<any>, dbFilt
 async function updateOrReplaceOneDocByFilterQuery(model: mongoose.Model<any>, dbFilterQuery: mongoose.FilterQuery<any>, updateDoc: mongoose.UpdateQuery<any>, replace = false, createIfNotPresent = false) {
     const modelName = model.modelName
 
-    try {
-        // new: true - return updated document instead of original
-        const options = {upsert: createIfNotPresent, new: true, rawResult: true}
-        const updateRawResult = replace 
-            ? await model.findOneAndReplace(dbFilterQuery, updateDoc, options)
-            : await model.findOneAndUpdate(dbFilterQuery, updateDoc, options)
+    // new: true - return updated document instead of original
+    const options = {upsert: createIfNotPresent, new: true, rawResult: true}
+    const updateRawResult = replace 
+        ? await model.findOneAndReplace(dbFilterQuery, updateDoc, options)
+        : await model.findOneAndUpdate(dbFilterQuery, updateDoc, options)
 
-        if(updateRawResult.ok === 1) {
-            return { doc: updateRawResult.value, updatedExisting: updateRawResult.lastErrorObject?.updatedExisting }
-        } else {
-            throw new AppError(404, `Cannot find ${modelName} by filter query ${JSON.stringify(dbFilterQuery)}`)
-        }
-    } catch (error: any) {
-        // If error of casting ":id" to MongoDB ObjectId ocurred, then we throw 404, because the object with this illegal _ID does not exist
-        if(error.kind === "ObjectId") {
-            throw new AppError(404, `Cannot find ${modelName} by filter query ${JSON.stringify(dbFilterQuery)} (illegal ObjectId value, must be 24 character hexadecimal)`)
-        } else {
-            throw error
-        }
+    if(updateRawResult.ok === 1) {
+        return { doc: updateRawResult.value, updatedExisting: updateRawResult.lastErrorObject?.updatedExisting }
+    } else {
+        throw new AppError(404, `Cannot find ${modelName} by filter query ${JSON.stringify(dbFilterQuery)}`)
     }
 }
 
@@ -98,16 +119,5 @@ export async function replaceOneDocByFilterQuery(model: mongoose.Model<any>, dbF
 
 // Returns deleted doc or null if doc has not been found (no error if no need to delete anything)
 export async function deleteOneDocByFilterQuery(model: mongoose.Model<any>, dbFilterQuery: mongoose.FilterQuery<any>) {        
-    try {
-        return await model.findOneAndDelete(dbFilterQuery)
-    } catch (error: any) {
-        // If error of casting ":id" to MongoDB ObjectId ocurred, then we return null,
-        // because the doc with this ID cannot exist. Therefore, if the user requests to delete it, 
-        // we respond  the same way as model.findOneAndDelete if doc does not exist (returns null)        
-        if(error.kind === "ObjectId") {
-            return null
-        } else {
-            throw error
-        }
-    }
+    return await model.findOneAndDelete(dbFilterQuery)
 }

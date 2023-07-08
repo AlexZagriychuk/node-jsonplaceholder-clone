@@ -1,11 +1,12 @@
 import mongoose from "mongoose";
-import { removePrivateMongoFields } from "../utils/mongoUtils";
-import { ObjectId } from "mongodb";
+import { registerIdUpdater, removePrivateMongoFields } from "../utils/mongoUtils";
 
+
+export const commentIdCounterName = "CommentID"
 
 export interface IComment {
-    "_id": ObjectId,
-    "postId": ObjectId,
+    "_id": number,
+    "postId": number,
     "name": string,
     "email": string,
     "body": string,
@@ -13,8 +14,8 @@ export interface IComment {
 }
 
 const commentSchema = new mongoose.Schema<IComment>({
-    "_id": {type: ObjectId, default: () => new ObjectId()},
-    "postId": {type: ObjectId, ref: "Post"},
+    "_id": {type: Number, default: -1}, // default must not be positive if we use registerIdUpdater
+    "postId": {type: Number, ref: "Post"},
     "name": String,
     "email": String,
     "body": String,
@@ -31,5 +32,7 @@ const commentSchema = new mongoose.Schema<IComment>({
         transform: removePrivateMongoFields
     }
 })
+
+registerIdUpdater(commentSchema, commentIdCounterName)
 
 export const commentModel = mongoose.model<IComment>("Comment", commentSchema)

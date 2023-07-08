@@ -1,18 +1,19 @@
 import mongoose from "mongoose";
-import { removePrivateMongoFields } from "../utils/mongoUtils";
-import { ObjectId } from "mongodb";
+import { registerIdUpdater, removePrivateMongoFields } from "../utils/mongoUtils";
 
+
+export const todoIdCounterName = "TodoID"
 
 export interface ITodo {
-    "_id": ObjectId,
-    "userId": ObjectId,
+    "_id": number,
+    "userId": number,
     "title": string,
     "completed": boolean,
 }
 
 const todoSchema = new mongoose.Schema<ITodo>({
-    "_id": {type: ObjectId, default: () => new ObjectId()},
-    "userId": {type: ObjectId, ref: "User"},
+    "_id": {type: Number, default: -1}, // default must not be positive if we use registerIdUpdater
+    "userId": {type: Number, ref: "User"},
     "title": String,
     "completed": Boolean,
 }, {
@@ -27,5 +28,7 @@ const todoSchema = new mongoose.Schema<ITodo>({
         transform: removePrivateMongoFields
     }
 })
+
+registerIdUpdater(todoSchema, todoIdCounterName)
 
 export const todoModel = mongoose.model<ITodo>("Todo", todoSchema)

@@ -1,10 +1,11 @@
 import mongoose from "mongoose";
-import { removePrivateMongoFields } from "../utils/mongoUtils";
-import { ObjectId } from "mongodb";
+import { registerIdUpdater, removePrivateMongoFields } from "../utils/mongoUtils";
 
+
+export const userIdCounterName = "UserID"
 
 export interface IUser {
-    "_id": ObjectId,
+    "_id": number,
     "name": string,
     "username": string,
     "email": string,
@@ -29,7 +30,7 @@ export interface IUser {
 }
 
 const userSchema = new mongoose.Schema<IUser>({
-    "_id": {type: ObjectId, default: () => new ObjectId()},
+    "_id": {type: Number, default: -1}, // default must not be positive if we use registerIdUpdater
     "name": String,
     "username": String,
     "email": String,
@@ -63,5 +64,7 @@ const userSchema = new mongoose.Schema<IUser>({
         transform: removePrivateMongoFields
     }
 })
+
+registerIdUpdater(userSchema, userIdCounterName)
 
 export const userModel = mongoose.model<IUser>("User", userSchema)

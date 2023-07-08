@@ -1,17 +1,17 @@
 import mongoose from "mongoose";
-import { removePrivateMongoFields } from "../utils/mongoUtils";
-import { ObjectId } from "mongodb";
+import { getNextIdCounterValue, registerIdUpdater, removePrivateMongoFields } from "../utils/mongoUtils";
 
+export const albumIdCounterName = "AlbumID"
 
 export interface IAlbum {
-    "_id": ObjectId,
-    "userId": ObjectId,
+    "_id": number,
+    "userId": number,
     "title": string,
 }
 
 const albumSchema = new mongoose.Schema<IAlbum>({
-    "_id": {type: ObjectId, default: () => new ObjectId()},
-    "userId": {type: ObjectId, ref: "User"},
+    "_id": {type: Number, default: -1}, // default must not be positive if we use registerIdUpdater
+    "userId": {type: Number, ref: "User"},
     "title": String,
 }, {
     // Throw error if values passed to our model constructor are not specified in our schema (unknown keys)
@@ -25,5 +25,7 @@ const albumSchema = new mongoose.Schema<IAlbum>({
         transform: removePrivateMongoFields
     }
 })
+
+registerIdUpdater(albumSchema, albumIdCounterName)
 
 export const albumModel = mongoose.model<IAlbum>("Album", albumSchema)

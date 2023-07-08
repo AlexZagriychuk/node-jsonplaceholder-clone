@@ -1,19 +1,20 @@
 import mongoose from "mongoose";
-import { removePrivateMongoFields } from "../utils/mongoUtils";
-import { ObjectId } from "mongodb";
+import { registerIdUpdater, removePrivateMongoFields } from "../utils/mongoUtils";
 
+
+export const photoIdCounterName = "PhotoID"
 
 export interface IPhoto {
-    "_id": ObjectId,
-    "albumId": ObjectId,
+    "_id": number,
+    "albumId": number,
     "title": string,
     "url": string,
     "thumbnailUrl": string,
 }
 
 const photoSchema = new mongoose.Schema<IPhoto>({
-    "_id": {type: ObjectId, default: () => new ObjectId()},
-    "albumId": {type: ObjectId, ref: "Album"},
+    "_id": {type: Number, default: -1}, // default must not be positive if we use registerIdUpdater
+    "albumId": {type: Number, ref: "Album"},
     "title": String,
     "url": String,
     "thumbnailUrl": String,
@@ -29,5 +30,7 @@ const photoSchema = new mongoose.Schema<IPhoto>({
         transform: removePrivateMongoFields
     }
 })
+
+registerIdUpdater(photoSchema, photoIdCounterName)
 
 export const photoModel = mongoose.model<IPhoto>("Photo", photoSchema)
