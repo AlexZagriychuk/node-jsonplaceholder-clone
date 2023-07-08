@@ -10,7 +10,7 @@ const router = express.Router()
 router.get("/", processRequestGetAllByRequestQueryParams(Album))
 router.get("/:id", processRequestGetById(Album))
 router.post("/", verifyBodyIsNotEmpty, processRequestPost(Album))
-router.put("/", verifyBodyIsNotEmpty, processRequestPutById(Album))
+router.put("/:id", verifyBodyIsNotEmpty, processRequestPutById(Album))
 router.patch("/:id", verifyBodyIsNotEmpty, processRequestPatchById(Album))
 router.delete("/:id", processRequestDeleteById(Album))
 

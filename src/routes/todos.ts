@@ -10,7 +10,7 @@ const router = express.Router()
 router.get("/", processRequestGetAllByRequestQueryParams(Todo))
 router.get("/:id", processRequestGetById(Todo))
 router.post("/", verifyBodyIsNotEmpty, processRequestPost(Todo))
-router.put("/", verifyBodyIsNotEmpty, processRequestPutById(Todo))
+router.put("/:id", verifyBodyIsNotEmpty, processRequestPutById(Todo))
 router.patch("/:id", verifyBodyIsNotEmpty, processRequestPatchById(Todo))
 router.delete("/:id", processRequestDeleteById(Todo))
 

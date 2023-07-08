@@ -9,7 +9,7 @@ const router = express.Router()
 router.get("/", processRequestGetAllByRequestQueryParams(Photo))
 router.get("/:id", processRequestGetById(Photo))
 router.post("/", verifyBodyIsNotEmpty, processRequestPost(Photo))
-router.put("/", verifyBodyIsNotEmpty, processRequestPutById(Photo))
+router.put("/:id", verifyBodyIsNotEmpty, processRequestPutById(Photo))
 router.patch("/:id", verifyBodyIsNotEmpty, processRequestPatchById(Photo))
 router.delete("/:id", processRequestDeleteById(Photo))
 
