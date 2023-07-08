@@ -1,4 +1,4 @@
-import { jsonplaceholderAlbums, jsonplaceholderPhotos, jsonplaceholderPosts, jsonplaceholderTodos, jsonplaceholderUsers } from "./jsonplaceholderData"
+import { jsonplaceholderAlbums, jsonplaceholderComments, jsonplaceholderPhotos, jsonplaceholderPosts, jsonplaceholderTodos, jsonplaceholderUsers } from "./jsonplaceholderData"
 
 
 export function generateUsers() {
@@ -28,6 +28,12 @@ export function generatePhotos() {
     // replacing "id" field with 24 character long hexadecimal "_id" field;
     // converting "albumId" field value to 24 character long hexadecimal
     return replaceWithHex24Chars(jsonplaceholderPhotos, [{ fieldName: "id", newFieldName: "_id" }, {fieldName: "albumId"}])
+}
+
+export function generateComments() {
+    // replacing "id" field with 24 character long hexadecimal "_id" field;
+    // converting "postId" field value to 24 character long hexadecimal
+    return replaceWithHex24Chars(jsonplaceholderComments, [{ fieldName: "id", newFieldName: "_id" }, {fieldName: "postId"}])
 }
 
 // - If both fieldName and newFieldName are passed then the filed with name ${fieldName} will be removed from an obj ...

@@ -5,6 +5,7 @@ import postsRouter from "./routes/posts"
 import todosRouter from "./routes/todos"
 import albumsRouter from "./routes/albums"
 import photosRouter from "./routes/photos"
+import commentsRouter from "./routes/comments"
 import resetDataRouter from "./routes/reset-data"
 import dotenv from "dotenv"
 import { requestLogger } from "./middleware/requestLoggers";
@@ -25,6 +26,7 @@ export async function startServer() {
     app.use("/todos", todosRouter)
     app.use("/albums", albumsRouter)
     app.use("/photos", photosRouter)
+    app.use("/comments", commentsRouter)
 
     app.use(errorLogger)
     app.use(errorResponder)
