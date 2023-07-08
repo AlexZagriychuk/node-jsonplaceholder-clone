@@ -23,13 +23,13 @@ router.get("/:id/posts", async function (req: Request, res: Response, next: Next
 })
 router.get("/:id/todos", async function (req: Request, res: Response, next: NextFunction) {
     const userId = req.params.id
-    const processRequestGetPostsByUserId = processRequestGetAllByCustomQueryParams(Todo, {userId})
-    await processRequestGetPostsByUserId(req, res, next)
+    const processRequestGetTodosByUserId = processRequestGetAllByCustomQueryParams(Todo, {userId})
+    await processRequestGetTodosByUserId(req, res, next)
 })
 router.get("/:id/albums", async function (req: Request, res: Response, next: NextFunction) {
     const userId = req.params.id
-    const processRequestGetPostsByUserId = processRequestGetAllByCustomQueryParams(Album, {userId})
-    await processRequestGetPostsByUserId(req, res, next)
+    const processRequestGetAlbumsByUserId = processRequestGetAllByCustomQueryParams(Album, {userId})
+    await processRequestGetAlbumsByUserId(req, res, next)
 })
 
 export default router
