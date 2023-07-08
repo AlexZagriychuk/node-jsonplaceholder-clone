@@ -17,21 +17,26 @@ router.put("/", async (_req: Request, res: Response, next: NextFunction) => {
         await User.insertMany(generateUsers())
 
         await Post.deleteMany({}) // delete all
+        await Post.collection.createIndex( { userId : 1 } )
         await Post.insertMany(generatePosts())
 
         await Todo.deleteMany({}) // delete all
+        await Todo.collection.createIndex( { userId : 1 } )
         await Todo.insertMany(generateTodos())
 
         await Album.deleteMany({}) // delete all
+        await Album.collection.createIndex( { userId : 1 } )
         await Album.insertMany(generateAlbums())
 
         await Photo.deleteMany({}) // delete all
+        await Photo.collection.createIndex( { albumId : 1 } )
         await Photo.insertMany(generatePhotos())
 
         await Comment.deleteMany({}) // delete all
+        await Comment.collection.createIndex( { postId : 1 } )
         await Comment.insertMany(generateComments())
 
-        res.status(201).send("Data for: [users, posts, todos, albums, photos] has been reset in the MongoDB")
+        res.status(201).send("Data for: [users, posts, todos, albums, photos, comments] has been reset in the MongoDB")
     } catch (error) {
         next(error)
     }
