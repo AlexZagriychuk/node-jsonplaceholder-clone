@@ -69,7 +69,7 @@ export function getDbFilterQuery(req: Request, paramsMapping: ParamsMapping) : m
 // If throwErrorIfNoDocsFound = false: returns empty array or array with 1+ found docs
 export async function findAllDocsByFilterQuery(model: mongoose.Model<any>, dbFilterQuery: mongoose.FilterQuery<any>, throwErrorIfNoDocsFound = true) {
     const modelName = model.modelName
-    const docs = await model.find(dbFilterQuery)
+    const docs = await model.find(dbFilterQuery).lean()
 
     if(docs.length === 0 && throwErrorIfNoDocsFound) {
         throw new AppError(404, `Cannot find ${modelName} by filter query ${JSON.stringify(dbFilterQuery)}`)
@@ -94,7 +94,7 @@ async function updateOrReplaceOneDocByFilterQuery(model: mongoose.Model<any>, db
     const modelName = model.modelName
 
     // new: true - return updated document instead of original
-    const options = {upsert: createIfNotPresent, new: true, rawResult: true}
+    const options = {upsert: createIfNotPresent, new: true, rawResult: true, lean: true}
     const updateRawResult = replace 
         ? await model.findOneAndReplace(dbFilterQuery, updateDoc, options)
         : await model.findOneAndUpdate(dbFilterQuery, updateDoc, options)
@@ -119,5 +119,14 @@ export async function replaceOneDocByFilterQuery(model: mongoose.Model<any>, dbF
 
 // Returns deleted doc or null if doc has not been found (no error if no need to delete anything)
 export async function deleteOneDocByFilterQuery(model: mongoose.Model<any>, dbFilterQuery: mongoose.FilterQuery<any>) {        
-    return await model.findOneAndDelete(dbFilterQuery)
+    return await model.findOneAndDelete(dbFilterQuery).lean()
+}
+
+
+// To make changes with body object (or one of the body array elements) we need to make sure 
+// we are working with plain old JavaScript objects (POJOs) and not with MongooseDocument
+// We can use "lean" option in our MongoDB requests to archive it (https://mongoosejs.com/docs/tutorials/lean.html)
+// So this function is just a fallback in case we missed and returned MongooseDocument instead of POJO somewhere
+export function convertMongooseDocumentToPojoIfNeeded(obj: any) {
+    return obj.hasOwnProperty("$isNew") ? obj.toObject() : obj
 }
