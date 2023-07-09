@@ -9,7 +9,7 @@ import { renameObjKey } from "./object"
 
 
 function renameId(objs: Array<Object>) {
-    return objs.map(obj => renameObjKey(obj, "_id", "id"))
+    return objs.map(obj => renameObjKey(obj, "id", "_id"))
 }
 
 export function generateUsers(): Array<IUser> {

@@ -12,7 +12,6 @@ const router = express.Router()
 
 function getMaxId(objs: Array<{_id: number}>) {
     const maxId = Math.max(...objs.map(obj => obj._id))
-    console.log("maxId:", maxId)
     return maxId
 }
 

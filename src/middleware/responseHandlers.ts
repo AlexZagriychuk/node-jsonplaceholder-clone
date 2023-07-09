@@ -17,7 +17,16 @@ export function processResponseJsonBody(body: any) {
 }
 
 export function processResponseSendBody(body: string) {
-    return processResponseJsonBody(JSON.parse(body))
+    let parsedBody
+
+    try {
+        parsedBody = JSON.parse(body)
+    } catch(e) {
+        // simply return original body if it cannot be parsed to JSON (most likely it is just text)
+        return body
+    }
+
+    return processResponseJsonBody(parsedBody)
 }
 
 
