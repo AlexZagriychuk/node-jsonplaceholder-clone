@@ -1,13 +1,12 @@
 'use strict';
 
-import { replaceFieldNamesInObject, replaceFieldNamesInObjects } from "../utils/object";
+import { renameObjKey } from "../utils/object";
  
 export function replaceIdInResponse(body: any) {
-    const fieldsToReplace = [{fieldName: "_id", newFieldName: "id"}]
     if(Array.isArray(body)) {
-        body = replaceFieldNamesInObjects(body, fieldsToReplace)
+        body = body.map(obj => renameObjKey(obj, "_id", "id"))
     } else {
-        body = replaceFieldNamesInObject(body, fieldsToReplace)
+        body = renameObjKey(body, "_id", "id")
     }
 
     return body

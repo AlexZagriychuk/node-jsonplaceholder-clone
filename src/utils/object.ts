@@ -1,15 +1,11 @@
-export function replaceFieldNamesInObjects(objs: Array<any>, fieldsToReplace: Array<{ fieldName: string, newFieldName: string }>) {
-    return objs.map(obj => replaceFieldNamesInObject(obj, fieldsToReplace))
-}
+// Rename obj key (preserve the keys order)
+export function renameObjKey(oldObj: any, oldKey: string, newKey: string) {
+    const keys = Object.keys(oldObj)
+    const newObj = keys.reduce((acc, objKey) => {
+        const key = objKey === oldKey ? newKey : objKey
+        acc[key] = oldObj[oldKey]
+        return acc
+    }, {} as any)
 
-export function replaceFieldNamesInObject(obj: any, fieldsToReplace: Array<{ fieldName: string, newFieldName: string }>) {
-    let copiedObj = JSON.parse(JSON.stringify(obj));
-
-    fieldsToReplace.forEach(fieldToReplace => {
-        const value = copiedObj[fieldToReplace.fieldName]
-        delete copiedObj[fieldToReplace.fieldName]
-        copiedObj[fieldToReplace.newFieldName] = value
-    })
-
-    return copiedObj
+    return newObj
 }

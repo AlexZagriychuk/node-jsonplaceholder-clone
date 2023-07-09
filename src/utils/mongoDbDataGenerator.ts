@@ -5,33 +5,33 @@ import { IPost } from "../models/post"
 import { ITodo } from "../models/todo"
 import { IUser } from "../models/user"
 import { jsonplaceholderAlbums, jsonplaceholderComments, jsonplaceholderPhotos, jsonplaceholderPosts, jsonplaceholderTodos, jsonplaceholderUsers } from "./jsonplaceholderData"
-import { replaceFieldNamesInObjects } from "./object"
+import { renameObjKey } from "./object"
 
 
-function replaceId(objs: Array<Object>) {
-    return replaceFieldNamesInObjects(objs, [{ fieldName: "id", newFieldName: "_id" }])
+function renameId(objs: Array<Object>) {
+    return objs.map(obj => renameObjKey(obj, "_id", "id"))
 }
 
 export function generateUsers(): Array<IUser> {
-    return replaceId(jsonplaceholderUsers)
+    return renameId(jsonplaceholderUsers)
 }
 
 export function generatePosts(): Array<IPost> {
-    return replaceId(jsonplaceholderPosts)
+    return renameId(jsonplaceholderPosts)
 }
 
 export function generateTodos(): Array<ITodo> {
-    return replaceId(jsonplaceholderTodos)
+    return renameId(jsonplaceholderTodos)
 }
 
 export function generateAlbums(): Array<IAlbum> {
-    return replaceId(jsonplaceholderAlbums)
+    return renameId(jsonplaceholderAlbums)
 }
 
 export function generatePhotos(): Array<IPhoto> {
-    return replaceId(jsonplaceholderPhotos)
+    return renameId(jsonplaceholderPhotos)
 }
 
 export function generateComments(): Array<IComment> {
-    return replaceId(jsonplaceholderComments)
+    return renameId(jsonplaceholderComments)
 }
