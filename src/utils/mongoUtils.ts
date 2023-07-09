@@ -3,9 +3,6 @@ import { AppError } from "../middleware/errorHandlers";
 import { Request } from "express";
 import { idCounterModel as IdCounter } from "../models/id_counter";
 
-export function removePrivateMongoFields(_doc: mongoose.Document<any>, ret: Record<string, any>, _game: mongoose.ToObjectOptions<any>) {
-    delete ret.__v;
-}
 
 // Find counter by name and increment by 1
 export async function getNextIdCounterValue(idCounterName: string) {
@@ -129,4 +126,14 @@ export async function deleteOneDocByFilterQuery(model: mongoose.Model<any>, dbFi
 // So this function is just a fallback in case we missed and returned MongooseDocument instead of POJO somewhere
 export function convertMongooseDocumentToPojoIfNeeded(obj: any) {
     return obj.hasOwnProperty("$isNew") ? obj.toObject() : obj
+}
+
+
+export function removePrivateMongoFields(_doc: mongoose.Document<any>, ret: Record<string, any>, _game: mongoose.ToObjectOptions<any>) {
+    removePrivateMongoFieldsFromObj(ret)
+}
+
+export function removePrivateMongoFieldsFromObj(obj: any) {
+    delete obj.__v;
+    return obj
 }

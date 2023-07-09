@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express"
 import { AppError } from "./errorHandlers";
-import { convertMongooseDocumentToPojoIfNeeded } from "../utils/mongoUtils";
+import { convertMongooseDocumentToPojoIfNeeded, removePrivateMongoFieldsFromObj } from "../utils/mongoUtils";
 import { renameObjKey } from "../utils/object";
 
 
@@ -9,13 +9,15 @@ function renameIdInBodyObj(obj: any) {
     return renameObjKey(obj, "_id", "id")
 }
 
-export function renameIdInResponseJson(body: any) {
-    console.log("body before interception", body)
-    return Array.isArray(body) ? body.map(renameIdInBodyObj) : renameIdInBodyObj(body)
+export function processResponseJsonBody(body: any) {
+    // rename _id into id, and remove private mongo fields from response
+    return Array.isArray(body) 
+        ? body.map(obj => removePrivateMongoFieldsFromObj(renameIdInBodyObj(obj))) 
+        : removePrivateMongoFieldsFromObj(renameIdInBodyObj(body))
 }
 
-export function renameIdInResponseSend(body: string) {
-    return renameIdInResponseJson(JSON.parse(body))
+export function processResponseSendBody(body: string) {
+    return processResponseJsonBody(JSON.parse(body))
 }
 
 
