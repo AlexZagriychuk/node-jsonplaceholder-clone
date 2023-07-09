@@ -11,6 +11,7 @@ import dotenv from "dotenv"
 import { requestLogger } from "./middleware/requestLoggers";
 import { errorLogger, errorResponder, invalidPathHandler } from "./middleware/errorHandlers";
 import cors from "cors"
+import { renameIdInResponseJson, renameIdInResponseSend, responseInterceptor } from "./middleware/responseHandlers";
 
 export async function startServer() {
     dotenv.config()
@@ -22,6 +23,7 @@ export async function startServer() {
     app.use(cors())
     app.use(express.json())
     app.use(requestLogger)
+    app.use(responseInterceptor(renameIdInResponseJson, renameIdInResponseSend))
 
     app.use("/reset-data", resetDataRouter)
     app.use("/users", usersRouter)

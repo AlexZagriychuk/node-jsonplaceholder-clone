@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from "express"
 import mongoose from "mongoose";
 import { deleteOneDocByFilterQuery, findAllDocsByFilterQuery, findOneDocByFilterQuery, getDbFilterQuery, replaceOneDocByFilterQuery, updateOneDocByFilterQuery } from "../utils/mongoUtils";
-import { replaceIdInResponse } from "./responseHandlers";
 
 
 function getAllByQueryParamsCommonImpl(model: mongoose.Model<any>, customQueryParams: mongoose.FilterQuery<any> | null) {
@@ -12,7 +11,7 @@ function getAllByQueryParamsCommonImpl(model: mongoose.Model<any>, customQueryPa
 
             // false - to return empty arr if no docs found (does not throw error)
             const foundDocs = await findAllDocsByFilterQuery(model, queryParams, false)
-            res.status(200).json(replaceIdInResponse(foundDocs))
+            res.status(200).json(foundDocs)
         } catch (error) {
             next(error)
         }
@@ -32,7 +31,7 @@ export function processRequestGetById(model: mongoose.Model<any>) {
         try {
             const dbFilterQuery = getDbFilterQuery(req, [{reqQueryParam: "id", dbParam: "_id"}])
             const foundDoc = await findOneDocByFilterQuery(model, dbFilterQuery, true)
-            res.status(200).json(replaceIdInResponse(foundDoc))
+            res.status(200).json(foundDoc)
         } catch (error) {
             next(error)
         }
@@ -43,7 +42,7 @@ export function processRequestPost(model: mongoose.Model<any>) {
     return async function (req: Request, res: Response, next: NextFunction) {
         try {
             const createdDoc = await model.create(req.body)
-            res.status(201).json(replaceIdInResponse(createdDoc))
+            res.status(201).json(createdDoc)
         } catch (error) {
             next(error)
         }
@@ -71,7 +70,7 @@ export function processRequestPatchById(model: mongoose.Model<any>) {
             const dbFilterQuery = getDbFilterQuery(req, [{reqQueryParam: "id", dbParam: "_id"}])
             // Will update doc, or throw error if doc with this _id is not present
             const updatedDoc = await updateOneDocByFilterQuery(model, dbFilterQuery, req.body)
-            res.status(201).json(replaceIdInResponse(updatedDoc))
+            res.status(201).json(updatedDoc)
         } catch (error) {
             next(error)
         }
