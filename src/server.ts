@@ -18,6 +18,7 @@ export async function startServer() {
     const DATABASE_URL = process.env.DATABASE_URL || "mongodb://127.0.0.1:27017/jsonplaceholder"
 
     const app = express()
+    app.set('json spaces', 2)
     app.use(cors())
     app.use(express.json())
     app.use(requestLogger)
