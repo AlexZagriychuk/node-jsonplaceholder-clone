@@ -10,13 +10,16 @@ import { renameObjKey } from "./object"
 
 export function generateUsers(): Array<IUser> {
     // Modify / add extra data on top of the original jsonplaceholder data
-    let users = addExtraUsersData(jsonplaceholderUsers)
+    const users = addExtraUsersData(jsonplaceholderUsers)
 
     return renameId(users)
 }
 
 export function generatePosts(): Array<IPost> {
-    return renameId(jsonplaceholderPosts)
+    // Modify / add extra data on top of the original jsonplaceholder data
+    const posts = addExtraPostsData(jsonplaceholderPosts)
+
+    return renameId(posts)
 }
 
 export function generateTodos(): Array<ITodo> {
@@ -38,8 +41,19 @@ export function generateComments(): Array<IComment> {
 //---------------------------------------------------------------------
 //---------------- processing jsonplaceholder data --------------------
 //---------------------------------------------------------------------
+// Rename id into _id for all elements in array
 function renameId(objs: Array<Object>) {
     return objs.map(obj => renameObjKey(obj, "id", "_id"))
+}
+
+// Generate fake createdAt dates for all posts
+function addExtraPostsData(postsData: any[]): IPost[] {
+    const postsLength = postsData.length;
+
+    const generatedDates = generateDates(postsLength, new Date(), DateUnit.HOUR, -1);
+    postsData.forEach((post, index) => { post.createdAt = generatedDates[postsLength - index - 1] });
+
+    return postsData;
 }
 
 // 1. Replace first user with our fake Admin user
@@ -122,7 +136,7 @@ function getRandomDate(startDate: Date, endDate: Date) {
 // - 1st date = random date between firstDateOfRange and firstDateOfRange-1 hour (if datesRangeStep is default); 
 // - 2nd date = random date between firstDateOfRange-1 hour and firstDateOfRange-2 hours (if datesRangeStep is default);
 // - and so on... 
-function generateDates(datesToGenerateCount: number, firstDateOfRange: Date = new Date(), datesRangeStepUnit: DateUnit = DateUnit.HOUR, datesRangeStepValue: number = -1): Date[] {
+function generateDates(datesToGenerateCount: number, firstDateOfRange: Date, datesRangeStepUnit: DateUnit, datesRangeStepValue: number): Date[] {
     const result = Array(datesToGenerateCount) as Date[]
     const dateStepRangeInMs = datesRangeStepUnit * datesRangeStepValue
 
