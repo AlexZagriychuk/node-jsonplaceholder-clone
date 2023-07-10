@@ -4,10 +4,19 @@ import { registerIdUpdater, removePrivateMongoFields } from "../utils/mongoUtils
 
 export const userIdCounterName = "UserID"
 
+export enum UserType {
+    ADMIN = "ADMIN",
+    WRITER = "WRITER",
+    READER = "READER"
+}
+
 export interface IUser {
     "_id": number,
     "name": string,
     "username": string,
+    "type": UserType,
+    "avatarSmall": string,
+    "avatarBig": string,
     "email": string,
     "address": {
         "street": string,
@@ -26,13 +35,16 @@ export interface IUser {
         "catchPhrase": string,
         "bs": string
     },
-    "createdAt": Date
+    "registered": Date
 }
 
 const userSchema = new mongoose.Schema<IUser>({
     "_id": {type: Number, default: -1}, // default must not be positive if we use registerIdUpdater
     "name": String,
     "username": String,
+    "type": {type: String, enum: UserType},
+    "avatarSmall": String,
+    "avatarBig": String,
     "email": String,
     "address": {
         "street": String,
@@ -51,7 +63,7 @@ const userSchema = new mongoose.Schema<IUser>({
         "catchPhrase": String,
         "bs": String
     },
-    "createdAt": { type: Date, default: () => Date.now() }
+    "registered": { type: Date, default: () => Date.now() }
 }, {
     // Throw error if values passed to our model constructor are not specified in our schema (unknown keys)
     strict: "throw",
