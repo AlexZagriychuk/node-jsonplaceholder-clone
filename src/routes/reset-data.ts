@@ -6,7 +6,7 @@ import { todoModel as Todo, todoIdCounterName } from "../models/todo";
 import { albumModel as Album, albumIdCounterName } from "../models/album";
 import { photoModel as Photo, photoIdCounterName } from "../models/photo";
 import { commentModel as Comment, commentIdCounterName } from "../models/comment";
-import { generateAlbums, generateComments, generatePhotos, generatePosts, generateTodos, generateUsers } from "../utils/mongoDbDataGenerator";
+import { generateAlbums, generateComments, generatePhotos, generatePosts, generateTodos, generateUsers } from "../fake_data_generation/mongoDbDataGenerator";
 
 const router = express.Router()
 

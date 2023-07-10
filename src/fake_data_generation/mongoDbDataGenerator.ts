@@ -5,7 +5,7 @@ import { IPost } from "../models/post"
 import { ITodo } from "../models/todo"
 import { IUser, UserType } from "../models/user"
 import { jsonplaceholderAlbums, jsonplaceholderComments, jsonplaceholderPhotos, jsonplaceholderPosts, jsonplaceholderTodos, jsonplaceholderUsers } from "./jsonplaceholderData"
-import { renameObjKey } from "./object"
+import { renameObjKey } from "../utils/object"
 
 
 export function generateUsers(): Array<IUser> {
