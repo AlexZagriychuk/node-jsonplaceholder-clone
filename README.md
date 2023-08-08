@@ -28,3 +28,16 @@ API server is deployed to the Fly service and running in a Docker container: htt
 `/photos/:id` - GET (by ID), PUT (by ID), PATCH (by ID), DELETE (by ID) 
 
 `/reset-data` - PUT (resets the test data in the DB)
+
+
+## Run
+`npm run start:dev` - start on local env (restart on code change)  
+`npm run start` - start on local env (without restart on code change)  
+`docker build .` - build a docker image (can be run locally)
+
+
+## Deploy
+On each push to master, the Docker image is automatically built and deployed to the Fly.io https://node-jsonplaceholder-clone.fly.dev due to the settings:
+- `.github\workflows\fly.yml` and `fly.toml` files;
+- GitHUB -> Settings -> Secrets And Variables -> Actions - must have `FLY_API_TOKEN` key; 
+- Fly.io -> This Project -> Secrets - must have `DATABASE_URL` (MongoDB URL) and `PORT` Env variables specified;
